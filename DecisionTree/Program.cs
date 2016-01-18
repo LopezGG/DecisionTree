@@ -13,11 +13,9 @@ namespace DecisionTree
         {
             string inputFilePath = args[0];
             string line;
-            List<int> PositiveClass = new List<int>();
-            List<int> NegativeClass = new List<int>();
-            List<Dictionary<string, bool>> InstanceDictList = new List<Dictionary<string, bool>>();
-            int positive = 0;
-            int negative = 0;
+            //stores id of the string corresponding to a particular class
+            List<String> ClassList = new List<String>();
+            List<Dictionary<string, int>> InstanceDictList = new List<Dictionary<string, int>>();
             using (StreamReader Sr = new StreamReader(inputFilePath))
             {
                 while ((line = Sr.ReadLine()) != null)
@@ -25,13 +23,19 @@ namespace DecisionTree
                     if (String.IsNullOrEmpty(line))
                         continue;
                     string[] words = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                    Dictionary<String, int> temp = new Dictionary<string, int>();
                     for (int i = 1; i < words.Length; i++)
                     {
                         string[] pair = words[i].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
                         if (pair.Length != 2)
                             throw new Exception("there is some error with input pairs");
-
+                        if (temp.ContainsKey(pair[0]))
+                            temp[pair[0]] += Convert.ToInt32(pair[1]);
+                        else
+                            temp.Add(pair[0], Convert.ToInt32(pair[1]));
                     }
+                    ClassList.Add(words[0]);
+                    InstanceDictList.Add(temp);
                 }
             }
 
