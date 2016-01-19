@@ -36,7 +36,7 @@ namespace DecisionTree
         public void createChildren(List<string> AttributeList, double threshold,int MaxDepth)
         {
             MaxGain mg = FindAttribute(AttributeList);
-            if (mg.maxGain < threshold || this.depth >= MaxDepth)
+            if (mg.maxGain < threshold || this.depth >= MaxDepth || String.IsNullOrWhiteSpace(mg.attribute))
             {
                 this.IsLeaf = true;
                 foreach (var inst in this.InstancesList)
