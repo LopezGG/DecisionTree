@@ -88,7 +88,15 @@ namespace DecisionTree
                 {
                     arr[i++] = item;
                 }
-                Console.WriteLine(String.Join(" ",arr.Reverse()));
+                double totalInst = root.InstancesList.Count;
+                StringBuilder Sb = new StringBuilder();
+                Sb.Append(totalInst);
+                foreach (var  label in root.classBreakdown)
+                {
+                    Sb.Append(" ");
+                    Sb.Append(label.Key +" "+ Convert.ToString(label.Value / totalInst));
+                }
+                Console.WriteLine(String.Join("&",arr.Reverse()) + " "+ Sb.ToString());
                 return;
             }
             else
