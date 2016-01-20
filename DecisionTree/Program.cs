@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,14 +12,20 @@ namespace DecisionTree
     {
         static void Main (string[] args)
         {
-            string inputFilePath = args[0];
+            string TrainingFilePath = args[0];
+            string TestFilePath = args[1];
+            int maxDepth = Convert.ToInt32(args[2]);
+            double minGain = Convert.ToDouble(args[3]);
+            string modelFile = args[4];
+            string sysOutput = args[5];
             string line;
             treeNode root = new treeNode();
             //create a class for each list
             List<String> AttributeList = new List<string>();
             Dictionary<String, int> ClassBreakDown = new Dictionary<string, int>();
             double totalInstances = 0;
-            using (StreamReader Sr = new StreamReader(inputFilePath))
+            Stopwatch stopwatch = Stopwatch.StartNew(); //creates and start the instance of Stopwatch
+            using (StreamReader Sr = new StreamReader(TrainingFilePath))
             {
                 while ((line = Sr.ReadLine()) != null)
                 {
@@ -65,20 +72,82 @@ namespace DecisionTree
             while(Tree.Count > 0)
             {
                 treeNode curNode = Tree.Pop();
-                curNode.createChildren(AttributeList, 0, 10);
+                curNode.createChildren(AttributeList, minGain, maxDepth);
                 if(!curNode.IsLeaf)
                 {
                     Tree.Push(curNode.PositiveChild);
                     Tree.Push(curNode.NegativeChild);
                 }
             }
-            //print rules
-            PrintTree(root, AttributesUsed);
 
-            Console.WriteLine("Done");
+            //print model file
+            StreamWriter Sw = new StreamWriter(modelFile);
+            PrintTree(root, AttributesUsed,Sw);
+            Sw.Close();
+
+            //Read Test File
+            List<Instance> TestInstancesList = new List<Instance>();
+            using (StreamReader Sr = new StreamReader(TestFilePath))
+            {
+                while ((line = Sr.ReadLine()) != null)
+                {
+                    if (String.IsNullOrEmpty(line))
+                        continue;
+                    string[] words = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                    Instance temp = new Instance(words[0]);
+
+                    for (int i = 1; i < words.Length; i++)
+                    {
+                        string[] pair = words[i].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+                        if (pair.Length != 2)
+                            throw new Exception("there is some error with input pairs");
+                        string key = pair[0];
+                        int value = Convert.ToInt32(pair[1]);
+                        if (temp.Features.ContainsKey(key))
+                            temp.Features[key] += value;
+                        else
+                            temp.Features.Add(key, Convert.ToInt32(pair[1]));
+                    }
+                    TestInstancesList.Add(temp);
+                }
+            }
+            StreamWriter Sw1 = new StreamWriter(sysOutput);
+            for (int i = 0; i < TestInstancesList.Count; i++)
+            {
+                classify(root, TestInstancesList[i], Sw1, i);
+            }
+            Sw1.Close();
+            stopwatch.Stop();
+            Console.WriteLine("Time Elapsed: " + Convert.ToString(stopwatch.ElapsedMilliseconds / 60000) + " minutes");
             Console.ReadLine();
         }
-        public static void PrintTree (treeNode root, Stack<String> AttributesUsed)
+
+        public static void classify(treeNode root ,Instance curInstance,StreamWriter Sw,int index)
+        {
+            //base case
+            if(root.IsLeaf)
+            {
+                StringBuilder Sb = new StringBuilder();
+                //Sb.Append(curInstance.Label);
+                //Sb.Append(" ");
+                Sb.Append("array:" + index + " ");
+                double totalInstances = root.InstancesList.Count;
+                foreach (var label in root.classBreakdown)
+                {
+                    Sb.Append(label.Key + " " + Convert.ToString(label.Value / totalInstances) + " ");
+                }
+                Sw.WriteLine(Sb.ToString());
+                return;
+            }
+            else
+            {
+                if (curInstance.Features.ContainsKey(root.AttributeToSplitOn) && curInstance.Features[root.AttributeToSplitOn] > 0)
+                    classify(root.PositiveChild, curInstance, Sw, index);
+                else
+                    classify(root.NegativeChild, curInstance, Sw, index);
+            }
+        }
+        public static void PrintTree (treeNode root, Stack<String> AttributesUsed,StreamWriter Sw)
         {
             if (root.IsLeaf)
             {
@@ -96,7 +165,7 @@ namespace DecisionTree
                     Sb.Append(" ");
                     Sb.Append(label.Key +" "+ Convert.ToString(label.Value / totalInst));
                 }
-                Console.WriteLine(String.Join("&",arr.Reverse()) + " "+ Sb.ToString());
+                Sw.WriteLine(String.Join("&", arr.Reverse()) + " " + Sb.ToString());
                 return;
             }
             else
@@ -104,11 +173,11 @@ namespace DecisionTree
                 if (String.IsNullOrWhiteSpace(root.AttributeToSplitOn))
                     Console.WriteLine("Empty"); 
                 AttributesUsed.Push(root.AttributeToSplitOn);
-                PrintTree(root.PositiveChild, AttributesUsed);
+                PrintTree(root.PositiveChild, AttributesUsed, Sw);
                 AttributesUsed.Pop();
 
                 AttributesUsed.Push("!" + root.AttributeToSplitOn);
-                PrintTree(root.NegativeChild, AttributesUsed);
+                PrintTree(root.NegativeChild, AttributesUsed, Sw);
                 AttributesUsed.Pop();
             }
             
