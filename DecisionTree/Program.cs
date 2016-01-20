@@ -112,8 +112,11 @@ namespace DecisionTree
                 }
             }
             StreamWriter Sw1 = new StreamWriter(sysOutput);
+            String[][] ConfusionArray = new string[TestInstancesList.Count][];
             for (int i = 0; i < TestInstancesList.Count; i++)
             {
+                ConfusionArray[i] = new string[2];
+                ConfusionArray[i][0] = TestInstancesList[i].Label;
                 classify(root, TestInstancesList[i], Sw1, i);
             }
             Sw1.Close();
@@ -122,7 +125,7 @@ namespace DecisionTree
             Console.ReadLine();
         }
 
-        public static void classify(treeNode root ,Instance curInstance,StreamWriter Sw,int index)
+        public static string classify(treeNode root ,Instance curInstance,StreamWriter Sw,int index)
         {
             //base case
             if(root.IsLeaf)
@@ -132,12 +135,16 @@ namespace DecisionTree
                 //Sb.Append(" ");
                 Sb.Append("array:" + index + " ");
                 double totalInstances = root.InstancesList.Count;
+                int maxValue = 0;
+                string PredClass = "";
                 foreach (var label in root.classBreakdown)
                 {
                     Sb.Append(label.Key + " " + Convert.ToString(label.Value / totalInstances) + " ");
+                    if (label.Value > maxValue)
+                        PredClass = label.Key;
                 }
                 Sw.WriteLine(Sb.ToString());
-                return;
+                return PredClass;
             }
             else
             {
