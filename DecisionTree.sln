@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecisionTree", "DecisionTree\DecisionTree.csproj", "{E077763F-088E-4B40-8B29-95D5F1A15D19}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadAndConvertToBinary", "ReadAndConvertToBinary\ReadAndConvertToBinary.csproj", "{19889E83-3B5B-4F5E-8BC0-382540E66DD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E077763F-088E-4B40-8B29-95D5F1A15D19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E077763F-088E-4B40-8B29-95D5F1A15D19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E077763F-088E-4B40-8B29-95D5F1A15D19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19889E83-3B5B-4F5E-8BC0-382540E66DD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19889E83-3B5B-4F5E-8BC0-382540E66DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19889E83-3B5B-4F5E-8BC0-382540E66DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19889E83-3B5B-4F5E-8BC0-382540E66DD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

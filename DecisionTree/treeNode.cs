@@ -36,7 +36,8 @@ namespace DecisionTree
         public void createChildren(List<string> AttributeList, double threshold,int MaxDepth)
         {
             MaxGain mg = FindAttribute(AttributeList);
-            if (mg.maxGain < threshold || this.depth >= MaxDepth || String.IsNullOrWhiteSpace(mg.attribute))
+            
+            if (mg.maxGain < threshold || this.depth > MaxDepth || String.IsNullOrWhiteSpace(mg.attribute))
             {
                 this.IsLeaf = true;
                 foreach (var inst in this.InstancesList)
@@ -48,6 +49,7 @@ namespace DecisionTree
                 }
                 return;
             }
+            //Console.WriteLine("Split on " + mg.attribute + " information Gain is " + mg.maxGain);
             this.AttributeToSplitOn = mg.attribute; 
             this.PositiveChild = new treeNode(mg.EntropyPositive,this.depth+1);
             this.NegativeChild = new treeNode(mg.EntropyNegative,this.depth+1);
